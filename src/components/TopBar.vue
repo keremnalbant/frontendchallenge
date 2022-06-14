@@ -15,7 +15,7 @@
       </button>
     </div>
     <div class="d-flex" role="search">
-      <button v-show="isLoggedIn" @click="logout()" class="btn btn-danger" type="submit">
+      <button v-show="$auth" @click="logout()" class="btn btn-danger" type="submit">
         Logout
       </button>
     </div>
@@ -24,14 +24,6 @@
 
 <script>
 export default {
-  data() {
-    return {
-      isLoggedIn:false
-    };
-  },
-  updated(){
-      this.isLoggedIn = sessionStorage.getItem("auth");
-  },
   methods: {
     logout() {
       sessionStorage.clear();

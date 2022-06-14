@@ -65,36 +65,36 @@ export default Vue.extend({
     <Loader :loading="1"> </Loader>
   </div>
   <div v-else>
-    <div style="margin-left:33%;">
-    <div class="card mt-2 rounded w-50">
-      <div class="card-body">Welcome! Here you can search for a film.</div>
-    </div>
-    <div class="card mt-2 rounded w-50">
-      <div class="card-body">
-        <b-form-input
-          class="text-center"
-          v-model="searchParam"
-          @keyup="autoComplete()"
-          placeholder="Enter something..."
-        ></b-form-input>
-        <div>
-          <!--  {{autoCompleteResults}} -->
-
-          <b-form-select
-            v-show="searchParam.length > 2"
-            style="overflow: hidden"
-            class="mt-3 rounded"
-            @change="search(), (isLoading = true)"
-            v-model="searchParam"
-            :options="autoCompleteResults"
-            :select-size="2"
-          ></b-form-select>
-        </div>
-        <b-button @click="search(), (isLoading = true)" class="mt-3">
-          Search
-        </b-button>
+    <div style="margin-left: 33%">
+      <div class="card mt-2 rounded w-50">
+        <div class="card-body">Welcome! Here you can search for a film.</div>
       </div>
-    </div>
+      <div class="card mt-2 rounded w-50">
+        <div class="card-body">
+          <b-form-input
+            class="text-center"
+            v-model="searchParam"
+            @keyup="autoComplete()"
+            placeholder="Enter something..."
+          ></b-form-input>
+          <div>
+            <!--  {{autoCompleteResults}} -->
+
+            <b-form-select
+              v-show="searchParam.length > 2"
+              style="overflow: hidden"
+              class="mt-3 rounded"
+              @change="search(), (isLoading = true)"
+              v-model="searchParam"
+              :options="autoCompleteResults"
+              :select-size="2"
+            ></b-form-select>
+          </div>
+          <b-button @click="search(), (isLoading = true)" class="mt-3">
+            Search
+          </b-button>
+        </div>
+      </div>
     </div>
     <div v-show="response.length > 0" class="mt-4">
       <div class="table-responsive mt-3 mb-0">
