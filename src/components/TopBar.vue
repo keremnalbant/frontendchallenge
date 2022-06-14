@@ -14,10 +14,6 @@
           <a class="nav-link text-light" href="/list">Listeleme</a>
         </li>
       </ul>
-      <form class="d-flex" role="search">
-        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-        <b-button class="text-light" type="submit">Search</b-button>
-      </form>
     </div>
   </div>
 </nav>

@@ -25,6 +25,11 @@ const routes: Array<RouteConfig> = [
     name: 'list',
     component: () => import(/* webpackChunkName: "about" */ '../views/ListPage.vue')
   },
+  {
+    path: '/list/:searchparam',
+    name: 'list',
+    component: () => import(/* webpackChunkName: "about" */ '../views/ListPage.vue')
+  },
 ]
 
 const router = new VueRouter({

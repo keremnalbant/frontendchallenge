@@ -89,6 +89,8 @@ export default Vue.extend({
             </tr>
           </tbody>
         </table>
+  <b-button variant="my-2"><router-link v-bind:to="'/list/' + searchParam">More Results
+            </router-link></b-button>
       </div>
       <!-- <b-card :img-src="response.Poster" img-alt="Poster" img-left class="mb-3">
         <b-card-text>
