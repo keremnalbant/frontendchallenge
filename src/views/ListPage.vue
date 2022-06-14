@@ -40,6 +40,7 @@ export default Vue.extend({
         { key: "actions", label: "Actions" },
       ],
       totalRows: 1,
+      totalResults: 0,
       currentPage: 1,
       perPage: 5,
       pageOptions: [5, 10, 15, { value: 100, text: "Show a lot" }],
@@ -64,6 +65,7 @@ export default Vue.extend({
         //console.log(res.data);
         this.response = res.data.Search;
         this.totalRows = this.response.length;
+        this.totalResults = res.data.totalResults;
       })
       .catch((err: any) => {
         this.isLoading = false;
@@ -151,7 +153,7 @@ export default Vue.extend({
               label-cols-sm="3"
               label-align-sm="right"
               label-size="sm"
-              class="mb-0"
+              class="mb-3"
             >
               <b-input-group size="sm">
                 <b-form-input
@@ -168,6 +170,9 @@ export default Vue.extend({
                 </b-input-group-append>
               </b-input-group>
             </b-form-group>
+            <span> <strong>Total Results:</strong> {{totalResults}}</span>
+            <br>
+            <span> <strong>Listing:</strong> {{response.length}}/{{totalResults}}</span>
           </b-col>
         </b-row>
       </b-card>
