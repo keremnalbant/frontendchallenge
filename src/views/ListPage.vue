@@ -115,7 +115,7 @@ export default Vue.extend({
      	}
   	},
     loadMoreResults(): any {
-      if(this.scrolledToBottom){
+      if(this.scrolledToBottom && (this.response.length/this.totalResults < 1)){
       axiosGET("s=" + this.searchParam + "&page=" + this.currentPage)
       .then((res: any) => {
         for(let i =0 ; i < res.data.Search.length; i++){
@@ -132,6 +132,8 @@ export default Vue.extend({
       .finally(() => {
         this.isLoading = false;
       });
+      }else{
+        this.isLoading = false;
       }
   }
 },
@@ -200,7 +202,7 @@ export default Vue.extend({
             @click="info(row.item, row.index, $event.target)"
             class="mr-1"
           >
-            Info modal
+            See JSON
           </b-button>
           <b-button size="sm" class="mr-1"><router-link v-bind:to="'/detail/' + row.item.imdbID">See Details
             </router-link></b-button

@@ -11,10 +11,11 @@ export default Vue.extend({
       searchParam: "",
       response: [],
       isLoading: false,
+      autoCompleteResults: [] as any,
     };
   },
   methods: {
-    search() {
+    search(): any {
       console.log(this.searchParam);
       axiosGET("s=" + this.searchParam).then((res: any) => {
         console.log(res.data);
@@ -28,6 +29,29 @@ export default Vue.extend({
     },
     capitalizeFirstLetter(string:string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
+},
+autoComplete() {
+  axiosGET("s=" + this.searchParam).then((res: any) => {
+    console.log(res.data);
+    this.autoCompleteResults = res.data.Search.map((item: any) => {
+      return {
+        text: item.Title,
+        value: item.Title
+      };
+    });
+  }).catch((err: any) =>{
+    this.isLoading=false;
+    console.log(err);
+  }).finally(() => {
+    this.isLoading = false;
+  });
+  /* console.log(this.searchParam);
+  axiosGET("s=" + this.searchParam).then((res : any) =>{
+    for(let i = 0; i<res.data.Search.length; i++){
+      this.autoCompleteResults.push(res.data.Search[i].Title);
+    }
+  })
+  console.log(this.autoCompleteResults); */
 }
   },
 });
@@ -46,8 +70,15 @@ export default Vue.extend({
         <b-form-input
           class="text-center"
           v-model="searchParam"
+          @keyup="autoComplete()"
           placeholder="Enter something..."
         ></b-form-input>
+        <div>
+
+         <!--  {{autoCompleteResults}} -->
+
+          <b-form-select class="mt-3" v-model="searchParam" :options="autoCompleteResults" :select-size="2"></b-form-select>
+        </div>
         <b-button @click="search(), isLoading=true" class="mt-3"> Search </b-button>
       </div>
     </div>
