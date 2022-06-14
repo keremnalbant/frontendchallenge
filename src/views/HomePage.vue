@@ -5,7 +5,7 @@ import Loader from "@/components/loader";
 
 export default Vue.extend({
   name: "Anasayfa",
-  components: {Loader},
+  components: { Loader },
   data() {
     return {
       searchParam: "",
@@ -14,58 +14,62 @@ export default Vue.extend({
       autoCompleteResults: [] as any,
     };
   },
+  mounted() {
+    if (!(sessionStorage.getItem("auth") == "true")) {
+      this.$router.push("/login");
+    }
+  },
   methods: {
     search(): any {
-      console.log(this.searchParam);
-      axiosGET("s=" + this.searchParam).then((res: any) => {
-        console.log(res.data);
-        this.response = res.data.Search;
-      }).catch((err: any) =>{
-        this.isLoading=false;
-        console.log(err);
-      }).finally(() => {
-        this.isLoading = false;
-      });
+      axiosGET("s=" + this.searchParam)
+        .then((res: any) => {
+          this.response = res.data.Search;
+        })
+        .catch((err: any) => {
+          this.isLoading = false;
+          console.log(err);
+        })
+        .finally(() => {
+          this.isLoading = false;
+        });
     },
-    capitalizeFirstLetter(string:string) {
-  return string.charAt(0).toUpperCase() + string.slice(1);
-},
-autoComplete() {
-  axiosGET("s=" + this.searchParam).then((res: any) => {
-    console.log(res.data);
-    this.autoCompleteResults = res.data.Search.map((item: any) => {
-      return {
-        text: item.Title,
-        value: item.Title
-      };
-    });
-  }).catch((err: any) =>{
-    this.isLoading=false;
-    console.log(err);
-  }).finally(() => {
-    this.isLoading = false;
-  });
-  /* console.log(this.searchParam);
-  axiosGET("s=" + this.searchParam).then((res : any) =>{
-    for(let i = 0; i<res.data.Search.length; i++){
-      this.autoCompleteResults.push(res.data.Search[i].Title);
-    }
-  })
-  console.log(this.autoCompleteResults); */
-}
+    capitalizeFirstLetter(string: string) {
+      return string.charAt(0).toUpperCase() + string.slice(1);
+    },
+    autoComplete() {
+      if (this.searchParam.length > 2) {
+        axiosGET("s=" + this.searchParam)
+          .then((res: any) => {
+            this.autoCompleteResults = res.data.Search.map((item: any) => {
+              return {
+                text: item.Title,
+                value: item.Title,
+              };
+            });
+          })
+          .catch((err: any) => {
+            this.isLoading = false;
+            console.log(err);
+          })
+          .finally(() => {
+            this.isLoading = false;
+          });
+      }
+    },
   },
 });
 </script>
 
 <template>
-<div v-if="isLoading">
-      <Loader :loading="1"> </Loader>
-    </div>
+  <div v-if="isLoading">
+    <Loader :loading="1"> </Loader>
+  </div>
   <div v-else>
-    <div class="card mt-2 rounded">
+    <div style="margin-left:33%;">
+    <div class="card mt-2 rounded w-50">
       <div class="card-body">Welcome! Here you can search for a film.</div>
     </div>
-    <div class="card mt-2 rounded">
+    <div class="card mt-2 rounded w-50">
       <div class="card-body">
         <b-form-input
           class="text-center"
@@ -74,15 +78,25 @@ autoComplete() {
           placeholder="Enter something..."
         ></b-form-input>
         <div>
+          <!--  {{autoCompleteResults}} -->
 
-         <!--  {{autoCompleteResults}} -->
-
-          <b-form-select class="mt-3" v-model="searchParam" :options="autoCompleteResults" :select-size="2"></b-form-select>
+          <b-form-select
+            v-show="searchParam.length > 2"
+            style="overflow: hidden"
+            class="mt-3 rounded"
+            @change="search(), (isLoading = true)"
+            v-model="searchParam"
+            :options="autoCompleteResults"
+            :select-size="2"
+          ></b-form-select>
         </div>
-        <b-button @click="search(), isLoading=true" class="mt-3"> Search </b-button>
+        <b-button @click="search(), (isLoading = true)" class="mt-3">
+          Search
+        </b-button>
       </div>
     </div>
-    <div v-show="response.length>0" class="mt-4">
+    </div>
+    <div v-show="response.length > 0" class="mt-4">
       <div class="table-responsive mt-3 mb-0">
         <table class="table align-middle table-nowrap">
           <thead class="table-light">
@@ -113,15 +127,20 @@ autoComplete() {
                 {{ capitalizeFirstLetter(data.Type) }}
               </td>
               <td>
-                <b-button variant="outline-success"><router-link v-bind:to="'/detail/' + data.imdbID">See Details
-            </router-link></b-button
+                <b-button variant="outline-success"
+                  ><router-link v-bind:to="'/detail/' + data.imdbID"
+                    >See Details
+                  </router-link></b-button
                 >
               </td>
             </tr>
           </tbody>
         </table>
-  <b-button variant="my-2"><router-link v-bind:to="'/list/' + searchParam">More Results
-            </router-link></b-button>
+        <b-button variant="my-2"
+          ><router-link v-bind:to="'/list/' + searchParam"
+            >More Results
+          </router-link></b-button
+        >
       </div>
       <!-- <b-card :img-src="response.Poster" img-alt="Poster" img-left class="mb-3">
         <b-card-text>

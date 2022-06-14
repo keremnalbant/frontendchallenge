@@ -1,6 +1,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { axiosGET } from "@/helpers/axiosService";
+import axios from "axios";
 import Loader from "@/components/loader";
 
 export default Vue.extend({
@@ -13,13 +14,18 @@ export default Vue.extend({
       searchParam: this.$route.params.searchparam,
       response: [],
       isLoading: true,
+      email: "",
+      title: "",
     };
   },
   mounted() {
+    if (!(sessionStorage.getItem("auth") == "true")) {
+      this.$router.push("/login");
+    }
     axiosGET("i=" + this.searchParam)
       .then((res: any) => {
-        console.log(res.data);
         this.response = res.data;
+        this.title = res.data.Title;
       })
       .catch((err: any) => {
         this.isLoading = false;
@@ -28,6 +34,38 @@ export default Vue.extend({
       .finally(() => {
         this.isLoading = false;
       });
+  },
+  methods: {
+    sendEmail() {
+      axios({
+        method: "post",
+        url: "https://localhost:7101/api/v1/SendEmail",
+        headers: {
+          Accept: "*/*",
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+        },
+        data: {
+          receivers: this.email,
+          subject: "Frontend Challenge",
+          body: "Merhaba, bu filmi izlemelisin. Film adı: " + this.title,
+        },
+      })
+        .then((res: any) => {
+          if (res.data.success == true) {
+            alert("Email gönderildi");
+          } else {
+            alert("Email gönderilemedi");
+          }
+        })
+        .catch((err: any) => {
+          this.isLoading = false;
+          console.log(err);
+        })
+        .finally(() => {
+          this.isLoading = false;
+        });
+    },
   },
 });
 </script>
@@ -67,11 +105,17 @@ export default Vue.extend({
                 id="inline-form-input-name"
                 class="float-end mr-sm-2 mb-sm-0"
                 placeholder="Suggest a friend"
+                v-model="email"
               ></b-form-input>
             </div>
             <div class="col-2">
-              <b-button class="float-start" variant="primary">Send E-Mail</b-button>
-              </div>
+              <b-button
+                @click="sendEmail()"
+                class="float-start"
+                variant="primary"
+                >Send E-Mail</b-button
+              >
+            </div>
             <div class="col-6">
               <b-button class="ms-2 float-end" variant="danger"
                 >Add to Favourites</b-button
@@ -103,7 +147,6 @@ export default Vue.extend({
               <h4 class="card-title mt-2">Review</h4>
               <b-form-textarea
                 id="textarea"
-                v-model="text"
                 placeholder="Enter something..."
                 rows="3"
                 max-rows="6"

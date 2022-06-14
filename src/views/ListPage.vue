@@ -20,24 +20,24 @@ export default Vue.extend({
         {
           key: "imdbID",
           sortable: true,
-          class: "text-center",
+          class: "text-center align-middle",
         },
         {
           key: "Title",
           sortable: true,
-          class: "text-center",
+          class: "text-center align-middle",
         },
         {
           key: "Type",
           sortable: true,
-          class: "text-center",
+          class: "text-center align-middle",
         },
         {
           key: "Year",
           sortable: true,
-          class: "text-center",
+          class: "text-center align-middle",
         },
-        { key: "actions", label: "Actions" },
+        { key: "actions", label: "Actions", class: "text-center align-middle" },
       ],
       totalRows: 1,
       totalResults: 0,
@@ -58,24 +58,25 @@ export default Vue.extend({
     };
   },
   mounted() {
-    this.scroll();
-    if(this.searchParam){
-      axiosGET("s=" + this.searchParam + "&page=" + this.currentPage)
-      .then((res: any) => {
-        //console.log(res.data);
-        this.response = res.data.Search;
-        this.totalRows = this.response.length;
-        this.totalResults = res.data.totalResults;
-      })
-      .catch((err: any) => {
-        this.isLoading = false;
-        console.log(err);
-      })
-      .finally(() => {
-        this.isLoading = false;
-      });
+    if (!(sessionStorage.getItem("auth") == "true")) {
+      this.$router.push("/login");
     }
-
+    this.scroll();
+    if (this.searchParam) {
+      axiosGET("s=" + this.searchParam + "&page=" + this.currentPage)
+        .then((res: any) => {
+          this.response = res.data.Search;
+          this.totalRows = this.response.length;
+          this.totalResults = res.data.totalResults;
+        })
+        .catch((err: any) => {
+          this.isLoading = false;
+          console.log(err);
+        })
+        .finally(() => {
+          this.isLoading = false;
+        });
+    }
   },
   computed: {
     sortOptions(): any {
@@ -101,50 +102,55 @@ export default Vue.extend({
       this.totalRows = filteredItems.length;
       this.currentPage = 1;
     },
-    scroll (): any {
+    scroll(): any {
       window.onscroll = () => {
-        let bottomOfWindow = Math.max(window.pageYOffset, document.documentElement.scrollTop, document.body.scrollTop) + window.innerHeight === document.documentElement.offsetHeight
+        let bottomOfWindow =
+          Math.max(
+            window.pageYOffset,
+            document.documentElement.scrollTop,
+            document.body.scrollTop
+          ) +
+            window.innerHeight ===
+          document.documentElement.offsetHeight;
 
         if (bottomOfWindow) {
-         this.scrolledToBottom = true;
-         this.currentPage += 1;
-         console.log(this.currentPage);
-         this.isLoading = true;
-         this.loadMoreResults();
+          this.scrolledToBottom = true;
+          this.currentPage += 1;
+          this.isLoading = true;
+          this.loadMoreResults();
         }
-     	}
-  	},
+      };
+    },
     loadMoreResults(): any {
-      if(this.scrolledToBottom && (this.response.length/this.totalResults < 1)){
-      axiosGET("s=" + this.searchParam + "&page=" + this.currentPage)
-      .then((res: any) => {
-        for(let i =0 ; i < res.data.Search.length; i++){
-          this.response.push(res.data.Search[i]);
-        }
-        this.totalRows = this.response.length;
-        this.scrolledToBottom = false;
-        console.log(res.data.Search);
-      })
-      .catch((err: any) => {
-        this.isLoading = false;
-        console.log(err);
-      })
-      .finally(() => {
-        this.isLoading = false;
-      });
-      }else{
+      if (
+        this.scrolledToBottom &&
+        this.response.length / this.totalResults < 1
+      ) {
+        axiosGET("s=" + this.searchParam + "&page=" + this.currentPage)
+          .then((res: any) => {
+            for (let i = 0; i < res.data.Search.length; i++) {
+              this.response.push(res.data.Search[i]);
+            }
+            this.totalRows = this.response.length;
+            this.scrolledToBottom = false;
+          })
+          .catch((err: any) => {
+            this.isLoading = false;
+            console.log(err);
+          })
+          .finally(() => {
+            this.isLoading = false;
+          });
+      } else {
         this.isLoading = false;
       }
-  }
-},
+    },
+  },
 });
 </script>
 
 <template>
-  <div v-if="isLoading">
-    <Loader :loading="1"> </Loader>
-  </div>
-  <div v-else>
+  <div>
     <b-container fluid>
       <!-- User Interface controls -->
       <b-card class="my-2">
@@ -172,9 +178,13 @@ export default Vue.extend({
                 </b-input-group-append>
               </b-input-group>
             </b-form-group>
-            <span> <strong>Total Results:</strong> {{totalResults}}</span>
-            <br>
-            <span> <strong>Listing:</strong> {{response.length}}/{{totalResults}}</span>
+            <span> <strong>Total Results:</strong> {{ totalResults }}</span>
+            <br />
+            <span>
+              <strong>Listing:</strong> {{ response.length }}/{{
+                totalResults
+              }}</span
+            >
           </b-col>
         </b-row>
       </b-card>
@@ -198,15 +208,20 @@ export default Vue.extend({
 
         <template #cell(actions)="row">
           <b-button
+            variant="primary"
             size="sm"
             @click="info(row.item, row.index, $event.target)"
             class="mr-1"
           >
             See JSON
           </b-button>
-          <b-button size="sm" class="mr-1"><router-link v-bind:to="'/detail/' + row.item.imdbID">See Details
+          <b-button size="sm" variant="primary" class="mr-1"
+            ><router-link
+              style="color: white"
+              v-bind:to="'/detail/' + row.item.imdbID"
+              >See Details
             </router-link></b-button
-                >
+          >
         </template>
 
         <template #row-details="row">
@@ -230,11 +245,17 @@ export default Vue.extend({
         <pre>{{ infoModal.content }}</pre>
       </b-modal>
     </b-container>
+    <div
+      style="margin-top: -50%; background-color: cornflowerblue"
+      v-if="isLoading"
+    >
+      <Loader :loading="1"> </Loader>
+    </div>
   </div>
 </template>
 <style scoped>
 body {
-  background: #20262E;
+  background: #20262e;
   padding: 0 20px;
   font-family: Helvetica;
 }
